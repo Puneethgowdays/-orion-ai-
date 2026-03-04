@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+groq
+faster-whisper
+pyttsx3
+sounddevice
+scipy
+numpy
+pydantic
