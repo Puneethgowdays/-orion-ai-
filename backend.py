@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional
 from llm_engine import query_llm
@@ -7,7 +8,6 @@ from personality import Personality
 
 app = FastAPI(title="ORION AI Backend")
 
-# Allow requests from anywhere (needed for mobile app)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,16 +15,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global personality instance
 orion = Personality(
     humor=50,
     honesty=60,
     memory_limit=40,
     mode="serious"
 )
-
-
-# -------- Request/Response Models --------
 
 class ChatRequest(BaseModel):
     message: str
@@ -38,17 +34,15 @@ class SetPersonalityRequest(BaseModel):
     mode: Optional[str] = None
 
 
-# -------- Routes --------
-
+# ✅ Serve the web chat interface at root
 @app.get("/")
 def root():
-    return {"status": "ORION online", "personality": orion.summary()}
+    return FileResponse("index.html")
 
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(request: ChatRequest):
     user_message = request.message.strip()
-
     if not user_message:
         raise HTTPException(status_code=400, detail="Message cannot be empty.")
 
@@ -59,10 +53,8 @@ def chat(request: ChatRequest):
         + f"\nUser says: {user_message}\n"
         + "ORION response:"
     )
-
     ai_reply = query_llm(final_prompt)
     orion.remember(f"ORION: {ai_reply}")
-
     return ChatResponse(reply=ai_reply)
 
 
