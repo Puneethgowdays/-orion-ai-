@@ -1,13 +1,15 @@
+import os
+import json
 from groq import Groq
 from tavily import TavilyClient
-import json
 
-# 🔑 API Keys
-GROQ_API_KEY = "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"
-TAVILY_API_KEY = "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"
+# 🔑 API Keys - ONLY from environment variables, never hardcoded
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY")
 
-import os
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "gsk_xxxx...")
+# ✅ Initialize both clients
+groq_client = Groq(api_key=GROQ_API_KEY)
+tavily_client = TavilyClient(api_key=TAVILY_API_KEY)
 
 # Keywords that trigger a web search
 REALTIME_KEYWORDS = [
@@ -18,13 +20,11 @@ REALTIME_KEYWORDS = [
 
 
 def needs_search(prompt):
-    """Check if the prompt needs real-time web data."""
     prompt_lower = prompt.lower()
     return any(keyword in prompt_lower for keyword in REALTIME_KEYWORDS)
 
 
 def search_web(query):
-    """Search the web using Tavily and return a summary."""
     try:
         result = tavily_client.search(query=query, max_results=3)
         snippets = []
@@ -36,24 +36,16 @@ def search_web(query):
 
 
 def query_llm(prompt, model="llama-3.3-70b-versatile"):
-    """
-    Query Groq API. Automatically searches web for real-time questions.
-    """
     try:
-        # ✅ Check if web search is needed
         if needs_search(prompt):
-            # Extract the last user message as search query
             query = prompt.split("User says:")[-1].replace("ORION response:", "").strip()
             print("🌐 Searching web...")
             search_results = search_web(query)
-            # Inject search results into prompt
             prompt = prompt + f"\n\nReal-time web search results:\n{search_results}\n\nUse the above search results to answer accurately."
 
         response = groq_client.chat.completions.create(
             model=model,
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
+            messages=[{"role": "user", "content": prompt}],
             max_tokens=500,
             temperature=0.7
         )
