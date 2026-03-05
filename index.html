@@ -18,6 +18,7 @@
       --orion-bg: #020c14;
       --danger: #ff3355;
       --success: #00ffaa;
+      --sidebar-w: 220px;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,7 +33,6 @@
       overflow: hidden;
     }
 
-    /* Animated grid background */
     body::before {
       content: '';
       position: fixed;
@@ -45,7 +45,6 @@
       z-index: 0;
     }
 
-    /* Header */
     header {
       position: relative;
       z-index: 10;
@@ -54,637 +53,641 @@
       justify-content: space-between;
       padding: 12px 24px;
       border-bottom: 1px solid var(--border);
-      background: rgba(2,4,8,0.95);
-      backdrop-filter: blur(10px);
+      background: rgba(2,4,8,0.97);
     }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .logo { display: flex; align-items: center; gap: 12px; }
 
     .logo-icon {
-      width: 36px;
-      height: 36px;
+      width: 32px; height: 32px;
       border: 2px solid var(--accent);
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
+      display: flex; align-items: center; justify-content: center;
       animation: pulse-ring 2s ease-in-out infinite;
     }
 
     .logo-icon::before {
       content: '';
-      width: 10px;
-      height: 10px;
+      width: 8px; height: 8px;
       background: var(--accent);
       border-radius: 50%;
       animation: pulse-dot 2s ease-in-out infinite;
     }
 
     @keyframes pulse-ring {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.4); }
-      50% { box-shadow: 0 0 0 8px rgba(0,212,255,0); }
+      0%,100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(0,212,255,0); }
     }
-
     @keyframes pulse-dot {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+      0%,100% { opacity:1; } 50% { opacity:0.3; }
     }
 
     .logo-text {
       font-family: 'Orbitron', sans-serif;
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: 4px;
-      color: var(--accent);
+      font-size: 18px; font-weight: 900;
+      letter-spacing: 4px; color: var(--accent);
       text-shadow: 0 0 20px rgba(0,212,255,0.5);
     }
 
-    .status-bar {
+    .status-bar { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--success); }
+    .status-dot { width:6px;height:6px;background:var(--success);border-radius:50%;animation:blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    /* Main layout */
+    .main {
       display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--success);
-    }
-
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--success);
-      border-radius: 50%;
-      animation: blink 1.5s ease-in-out infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
-    }
-
-    /* Personality panel */
-    .personality-bar {
+      flex: 1;
+      overflow: hidden;
       position: relative;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      padding: 8px 24px;
+      z-index: 1;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-w);
       background: var(--panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 12px;
       border-bottom: 1px solid var(--border);
-      flex-wrap: wrap;
     }
 
-    .slider-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--dim);
-    }
-
-    .slider-group label {
-      letter-spacing: 1px;
-      min-width: 60px;
-    }
-
-    input[type=range] {
-      -webkit-appearance: none;
-      width: 100px;
-      height: 2px;
-      background: var(--border);
-      outline: none;
-      border-radius: 2px;
-    }
-
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 12px;
-      height: 12px;
-      background: var(--accent);
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 0 8px var(--accent);
-    }
-
-    .slider-val {
-      color: var(--accent);
-      min-width: 30px;
-      font-size: 11px;
-    }
-
-    .mode-select {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--accent);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      padding: 3px 8px;
-      cursor: pointer;
-      letter-spacing: 1px;
-    }
-
-    .mode-select option {
-      background: var(--panel);
-    }
-
-    .apply-btn {
+    .new-chat-btn {
+      width: 100%;
       background: transparent;
       border: 1px solid var(--accent);
       color: var(--accent);
       font-family: 'Share Tech Mono', monospace;
       font-size: 11px;
-      padding: 4px 12px;
+      padding: 8px;
       cursor: pointer;
       letter-spacing: 1px;
       transition: all 0.2s;
     }
 
-    .apply-btn:hover {
-      background: var(--accent);
-      color: var(--bg);
+    .new-chat-btn:hover { background: var(--accent); color: var(--bg); }
+
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
     }
+
+    .chat-list::-webkit-scrollbar { width: 3px; }
+    .chat-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .chat-item {
+      padding: 8px 10px;
+      cursor: pointer;
+      border-radius: 2px;
+      font-size: 11px;
+      color: var(--dim);
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      transition: all 0.15s;
+      border: 1px solid transparent;
+    }
+
+    .chat-item:hover { background: rgba(0,212,255,0.05); color: var(--text); border-color: var(--border); }
+    .chat-item.active { background: rgba(0,212,255,0.08); color: var(--accent); border-color: var(--border); }
+
+    .chat-item-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .chat-delete {
+      background: none; border: none; color: var(--dim);
+      cursor: pointer; font-size: 10px; padding: 2px 4px;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .chat-item:hover .chat-delete { opacity: 1; }
+    .chat-delete:hover { color: var(--danger); }
+
+    /* Right panel */
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Personality bar */
+    .personality-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 20px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .slider-group { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--dim); }
+    .slider-group label { letter-spacing:1px; min-width:55px; }
+
+    input[type=range] {
+      -webkit-appearance:none; width:90px; height:2px;
+      background:var(--border); outline:none; border-radius:2px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance:none; width:11px; height:11px;
+      background:var(--accent); border-radius:50%; cursor:pointer;
+      box-shadow:0 0 6px var(--accent);
+    }
+
+    .slider-val { color:var(--accent); min-width:28px; font-size:11px; }
+
+    .mode-select {
+      background:transparent; border:1px solid var(--border);
+      color:var(--accent); font-family:'Share Tech Mono',monospace;
+      font-size:11px; padding:3px 6px; cursor:pointer;
+    }
+    .mode-select option { background:var(--panel); }
+
+    .apply-btn {
+      background:transparent; border:1px solid var(--accent);
+      color:var(--accent); font-family:'Share Tech Mono',monospace;
+      font-size:11px; padding:4px 10px; cursor:pointer; letter-spacing:1px;
+      transition:all 0.2s;
+    }
+    .apply-btn:hover { background:var(--accent); color:var(--bg); }
+
+    .voice-toggle {
+      background:transparent; font-family:'Share Tech Mono',monospace;
+      font-size:11px; padding:4px 10px; cursor:pointer; letter-spacing:1px;
+      transition:all 0.2s; border:1px solid var(--dim); color:var(--dim);
+    }
+    .voice-toggle.on { border-color:var(--accent); color:var(--accent); }
 
     /* Chat area */
     .chat-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px 24px;
-      position: relative;
-      z-index: 1;
-      scroll-behavior: smooth;
+      flex:1; overflow-y:auto; padding:20px;
+      scroll-behavior:smooth;
     }
+    .chat-area::-webkit-scrollbar { width:3px; }
+    .chat-area::-webkit-scrollbar-thumb { background:var(--border); }
 
-    .chat-area::-webkit-scrollbar { width: 4px; }
-    .chat-area::-webkit-scrollbar-track { background: transparent; }
-    .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .message { display:flex; margin-bottom:14px; animation:fadeUp 0.25s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-    .message {
-      display: flex;
-      margin-bottom: 16px;
-      animation: fadeUp 0.3s ease;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .message.user { justify-content: flex-end; }
-    .message.orion { justify-content: flex-start; }
+    .message.user { justify-content:flex-end; }
+    .message.orion { justify-content:flex-start; }
 
     .bubble {
-      max-width: 70%;
-      padding: 12px 16px;
-      border-radius: 2px;
-      font-size: 13px;
-      line-height: 1.6;
-      position: relative;
+      max-width: 72%; padding:10px 14px;
+      font-size:13px; line-height:1.6;
     }
 
     .user .bubble {
-      background: var(--user-bg);
-      border: 1px solid var(--accent2);
-      border-right: 3px solid var(--accent2);
-      color: var(--text);
+      background:var(--user-bg); border:1px solid var(--accent2);
+      border-right:3px solid var(--accent2);
     }
 
     .orion .bubble {
-      background: var(--orion-bg);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      color: var(--text);
+      background:var(--orion-bg); border:1px solid var(--border);
+      border-left:3px solid var(--accent);
     }
 
-    .bubble-label {
-      font-size: 9px;
-      letter-spacing: 2px;
-      margin-bottom: 6px;
-      color: var(--dim);
-    }
+    .bubble-label { font-size:9px; letter-spacing:2px; margin-bottom:5px; color:var(--dim); }
+    .user .bubble-label { color:var(--accent2); text-align:right; }
+    .orion .bubble-label { color:var(--accent); }
 
-    .user .bubble-label { color: var(--accent2); text-align: right; }
-    .orion .bubble-label { color: var(--accent); }
-
-    /* Typing indicator */
-    .typing-indicator {
-      display: none;
-      margin-bottom: 16px;
-    }
-
-    .typing-indicator.visible { display: flex; }
-
+    .typing-indicator { display:none; margin-bottom:14px; padding-left:20px; }
+    .typing-indicator.visible { display:flex; }
     .typing-bubble {
-      background: var(--orion-bg);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      padding: 12px 16px;
-      border-radius: 2px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      background:var(--orion-bg); border:1px solid var(--border);
+      border-left:3px solid var(--accent);
+      padding:10px 14px; display:flex; align-items:center; gap:5px;
     }
-
     .typing-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: typingBounce 1.2s ease-in-out infinite;
+      width:5px;height:5px;background:var(--accent);border-radius:50%;
+      animation:typingBounce 1.2s ease-in-out infinite;
     }
-
-    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
+    .typing-dot:nth-child(2){animation-delay:0.2s}
+    .typing-dot:nth-child(3){animation-delay:0.4s}
     @keyframes typingBounce {
-      0%, 100% { transform: translateY(0); opacity: 0.3; }
-      50% { transform: translateY(-4px); opacity: 1; }
+      0%,100%{transform:translateY(0);opacity:0.3}
+      50%{transform:translateY(-4px);opacity:1}
     }
 
-    /* Welcome message */
     .welcome {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--dim);
+      text-align:center; padding:50px 20px; color:var(--dim);
     }
-
     .welcome h2 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 28px;
-      color: var(--accent);
-      text-shadow: 0 0 30px rgba(0,212,255,0.3);
-      margin-bottom: 8px;
-      letter-spacing: 6px;
+      font-family:'Orbitron',sans-serif; font-size:26px;
+      color:var(--accent); text-shadow:0 0 30px rgba(0,212,255,0.3);
+      margin-bottom:8px; letter-spacing:6px;
     }
-
-    .welcome p {
-      font-size: 12px;
-      letter-spacing: 2px;
-      margin-bottom: 4px;
-    }
+    .welcome p { font-size:11px; letter-spacing:2px; margin-bottom:4px; }
 
     /* Input area */
     .input-area {
-      position: relative;
-      z-index: 10;
-      padding: 16px 24px;
-      background: rgba(2,4,8,0.95);
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
-    }
-
-    .input-wrapper {
-      flex: 1;
-      position: relative;
+      padding:14px 20px;
+      background:rgba(2,4,8,0.97);
+      border-top:1px solid var(--border);
+      display:flex; gap:8px; align-items:flex-end;
     }
 
     textarea {
-      width: 100%;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-bottom: 2px solid var(--accent);
-      color: var(--text);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 13px;
-      padding: 12px 14px;
-      resize: none;
-      outline: none;
-      min-height: 44px;
-      max-height: 120px;
-      transition: border-color 0.2s;
-      letter-spacing: 0.5px;
+      flex:1; background:var(--panel);
+      border:1px solid var(--border); border-bottom:2px solid var(--accent);
+      color:var(--text); font-family:'Share Tech Mono',monospace;
+      font-size:13px; padding:10px 12px; resize:none; outline:none;
+      min-height:42px; max-height:120px; transition:border-color 0.2s;
     }
-
-    textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 15px rgba(0,212,255,0.1);
-    }
-
-    textarea::placeholder { color: var(--dim); }
+    textarea:focus { border-color:var(--accent); box-shadow:0 0 12px rgba(0,212,255,0.1); }
+    textarea::placeholder { color:var(--dim); }
 
     .btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--dim);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      padding: 10px 16px;
-      cursor: pointer;
-      letter-spacing: 1px;
-      transition: all 0.2s;
-      height: 44px;
-      white-space: nowrap;
+      background:transparent; border:1px solid var(--border);
+      color:var(--dim); font-family:'Share Tech Mono',monospace;
+      font-size:11px; padding:9px 14px; cursor:pointer;
+      letter-spacing:1px; transition:all 0.2s; height:42px;
     }
-
-    .btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    .btn:hover { border-color:var(--accent); color:var(--accent); }
 
     .btn-send {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: var(--bg);
-      font-weight: bold;
+      background:var(--accent); border-color:var(--accent);
+      color:var(--bg); font-weight:bold;
     }
-
-    .btn-send:hover {
-      background: transparent;
-      color: var(--accent);
-    }
-
-    .btn-voice {
-      border-color: var(--dim);
-      position: relative;
-    }
+    .btn-send:hover { background:transparent; color:var(--accent); }
 
     .btn-voice.recording {
-      border-color: var(--danger);
-      color: var(--danger);
-      animation: recording-pulse 1s ease-in-out infinite;
+      border-color:var(--danger); color:var(--danger);
+      animation:recpulse 1s ease-in-out infinite;
+    }
+    @keyframes recpulse {
+      0%,100%{box-shadow:0 0 0 0 rgba(255,51,85,0.4)}
+      50%{box-shadow:0 0 0 5px rgba(255,51,85,0)}
     }
 
-    @keyframes recording-pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(255,51,85,0.4); }
-      50% { box-shadow: 0 0 0 6px rgba(255,51,85,0); }
-    }
-
-    /* Scan line effect */
     .scanline {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      opacity: 0.15;
-      animation: scan 4s linear infinite;
-      pointer-events: none;
-      z-index: 100;
+      position:fixed; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,transparent,var(--accent),transparent);
+      opacity:0.1; animation:scan 5s linear infinite;
+      pointer-events:none; z-index:100;
     }
+    @keyframes scan { 0%{top:0} 100%{top:100vh} }
 
-    @keyframes scan {
-      0% { top: 0; }
-      100% { top: 100vh; }
-    }
-
-    /* Corner decorations */
-    .corner {
-      position: fixed;
-      width: 20px;
-      height: 20px;
-      z-index: 5;
-      opacity: 0.4;
-    }
-
-    .corner-tl { top: 8px; left: 8px; border-top: 1px solid var(--accent); border-left: 1px solid var(--accent); }
-    .corner-tr { top: 8px; right: 8px; border-top: 1px solid var(--accent); border-right: 1px solid var(--accent); }
-    .corner-bl { bottom: 8px; left: 8px; border-bottom: 1px solid var(--accent); border-left: 1px solid var(--accent); }
-    .corner-br { bottom: 8px; right: 8px; border-bottom: 1px solid var(--accent); border-right: 1px solid var(--accent); }
-
-    @media (max-width: 600px) {
-      .personality-bar { gap: 10px; }
-      input[type=range] { width: 70px; }
-      .bubble { max-width: 85%; }
-      header { padding: 10px 14px; }
-      .chat-area { padding: 14px; }
-      .input-area { padding: 10px 14px; }
+    @media(max-width:600px) {
+      .sidebar { display:none; }
+      .bubble { max-width:88%; }
     }
   </style>
 </head>
 <body>
 
-  <div class="scanline"></div>
-  <div class="corner corner-tl"></div>
-  <div class="corner corner-tr"></div>
-  <div class="corner corner-bl"></div>
-  <div class="corner corner-br"></div>
+<div class="scanline"></div>
 
-  <!-- Header -->
-  <header>
-    <div class="logo">
-      <div class="logo-icon"></div>
-      <span class="logo-text">ORION</span>
-    </div>
-    <div class="status-bar">
-      <div class="status-dot"></div>
-      <span id="statusText">SYSTEM ONLINE</span>
-    </div>
-  </header>
+<header>
+  <div class="logo">
+    <div class="logo-icon"></div>
+    <span class="logo-text">ORION</span>
+  </div>
+  <div class="status-bar">
+    <div class="status-dot"></div>
+    <span id="statusText">SYSTEM ONLINE</span>
+  </div>
+</header>
 
-  <!-- Personality Controls -->
-  <div class="personality-bar">
-    <div class="slider-group">
-      <label>HUMOR</label>
-      <input type="range" id="humorSlider" min="0" max="100" value="50" oninput="document.getElementById('humorVal').textContent=this.value+'%'"/>
-      <span class="slider-val" id="humorVal">50%</span>
+<div class="main">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <button class="new-chat-btn" onclick="newChat()">+ NEW CHAT</button>
     </div>
-    <div class="slider-group">
-      <label>HONESTY</label>
-      <input type="range" id="honestySlider" min="0" max="100" value="60" oninput="document.getElementById('honestyVal').textContent=this.value+'%'"/>
-      <span class="slider-val" id="honestyVal">60%</span>
-    </div>
-    <div class="slider-group">
-      <label>MODE</label>
-      <select class="mode-select" id="modeSelect">
-        <option value="serious">SERIOUS</option>
-        <option value="casual">CASUAL</option>
-        <option value="dry">DRY</option>
-      </select>
-    </div>
-    <button class="apply-btn" onclick="applyPersonality()">APPLY</button>
+    <div class="chat-list" id="chatList"></div>
   </div>
 
-  <!-- Chat Area -->
-  <div class="chat-area" id="chatArea">
-    <div class="welcome">
-      <h2>ORION</h2>
-      <p>PRAGMATIC AI ASSISTANT</p>
-      <p style="margin-top:16px; font-size:11px;">INSPIRED BY TARS · INTERSTELLAR</p>
-    </div>
-  </div>
+  <!-- Right panel -->
+  <div class="right-panel">
 
-  <!-- Typing indicator -->
-  <div class="typing-indicator" id="typingIndicator">
-    <div class="typing-bubble">
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
+    <!-- Personality bar -->
+    <div class="personality-bar">
+      <div class="slider-group">
+        <label>HUMOR</label>
+        <input type="range" id="humorSlider" min="0" max="100" value="50"
+          oninput="document.getElementById('humorVal').textContent=this.value+'%'"/>
+        <span class="slider-val" id="humorVal">50%</span>
+      </div>
+      <div class="slider-group">
+        <label>HONESTY</label>
+        <input type="range" id="honestySlider" min="0" max="100" value="60"
+          oninput="document.getElementById('honestyVal').textContent=this.value+'%'"/>
+        <span class="slider-val" id="honestyVal">60%</span>
+      </div>
+      <div class="slider-group">
+        <label>MODE</label>
+        <select class="mode-select" id="modeSelect">
+          <option value="serious">SERIOUS</option>
+          <option value="casual">CASUAL</option>
+          <option value="dry">DRY</option>
+        </select>
+      </div>
+      <button class="apply-btn" onclick="applyPersonality()">APPLY</button>
+      <button class="voice-toggle" id="voiceToggle" onclick="toggleVoiceOutput()">🔇 VOICE</button>
     </div>
-  </div>
 
-  <!-- Input Area -->
-  <div class="input-area">
-    <button class="btn btn-voice" id="voiceBtn" onclick="toggleVoice()" title="Voice input">🎙</button>
-    <div class="input-wrapper">
+    <!-- Chat area -->
+    <div class="chat-area" id="chatArea">
+      <div class="welcome">
+        <h2>ORION</h2>
+        <p>PRAGMATIC AI ASSISTANT</p>
+        <p style="margin-top:14px;font-size:10px;opacity:0.5;">INSPIRED BY TARS · INTERSTELLAR</p>
+      </div>
+    </div>
+
+    <!-- Typing indicator -->
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="typing-bubble">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="input-area">
+      <button class="btn btn-voice" id="voiceBtn" onclick="toggleVoice()">🎙</button>
       <textarea id="msgInput" placeholder="TRANSMIT MESSAGE TO ORION..." rows="1"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
         oninput="autoResize(this)"></textarea>
+      <button class="btn btn-send" onclick="sendMessage()">SEND ▶</button>
     </div>
-    <button class="btn btn-send" onclick="sendMessage()">SEND ▶</button>
+
   </div>
+</div>
 
-  <script>
-    const API = 'https://orion-ai-76hk.onrender.com';
-    let isRecording = false;
-    let recognition = null;
+<script>
+  const API = 'https://orion-ai-76hk.onrender.com';
+  let currentChatId = null;
+  let voiceOutputEnabled = false;
+  let isRecording = false;
+  let recognition = null;
 
-    // Auto resize textarea
-    function autoResize(el) {
-      el.style.height = 'auto';
-      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-    }
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
 
-    // Add message to chat
-    function addMessage(text, sender) {
-      const chatArea = document.getElementById('chatArea');
+  // -------- Chat Management --------
 
-      // Remove welcome message if exists
-      const welcome = chatArea.querySelector('.welcome');
-      if (welcome) welcome.remove();
+  async function loadChats() {
+    try {
+      const res = await fetch(`${API}/chats`);
+      const data = await res.json();
+      renderChatList(data.chats);
+    } catch {}
+  }
 
-      const msg = document.createElement('div');
-      msg.className = `message ${sender}`;
-
-      const label = sender === 'user' ? 'YOU' : 'ORION';
-      msg.innerHTML = `
-        <div class="bubble">
-          <div class="bubble-label">${label}</div>
-          ${text}
-        </div>
+  function renderChatList(chatsList) {
+    const list = document.getElementById('chatList');
+    list.innerHTML = '';
+    // Sort newest first
+    chatsList.sort((a,b) => b.created > a.created ? 1 : -1);
+    chatsList.forEach(chat => {
+      const item = document.createElement('div');
+      item.className = `chat-item${chat.id === currentChatId ? ' active' : ''}`;
+      item.dataset.id = chat.id;
+      item.innerHTML = `
+        <span class="chat-item-title">${chat.title || 'New Chat'}</span>
+        <button class="chat-delete" onclick="deleteChat('${chat.id}', event)">✕</button>
       `;
-
-      chatArea.appendChild(msg);
-      chatArea.scrollTop = chatArea.scrollHeight;
-    }
-
-    // Show/hide typing indicator
-    function setTyping(show) {
-      const indicator = document.getElementById('typingIndicator');
-      indicator.classList.toggle('visible', show);
-      if (show) {
-        const chatArea = document.getElementById('chatArea');
-        chatArea.scrollTop = chatArea.scrollHeight;
-      }
-    }
-
-    // Send message
-    async function sendMessage() {
-      const input = document.getElementById('msgInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      input.value = '';
-      input.style.height = 'auto';
-      addMessage(text, 'user');
-      setTyping(true);
-
-      try {
-        const res = await fetch(`${API}/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text })
-        });
-
-        const data = await res.json();
-        setTyping(false);
-        addMessage(data.reply, 'orion');
-      } catch (err) {
-        setTyping(false);
-        addMessage('⚠ CONNECTION ERROR. CHECK BACKEND STATUS.', 'orion');
-      }
-    }
-
-    // Apply personality settings
-    async function applyPersonality() {
-      const humor = parseFloat(document.getElementById('humorSlider').value);
-      const honesty = parseFloat(document.getElementById('honestySlider').value);
-      const mode = document.getElementById('modeSelect').value;
-
-      try {
-        await fetch(`${API}/personality`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ humor, honesty, mode })
-        });
-        addMessage(`PERSONALITY UPDATED — Humor: ${humor}% | Honesty: ${honesty}% | Mode: ${mode.toUpperCase()}`, 'orion');
-      } catch (err) {
-        addMessage('⚠ FAILED TO UPDATE PERSONALITY.', 'orion');
-      }
-    }
-
-    // Voice input
-    function toggleVoice() {
-      const btn = document.getElementById('voiceBtn');
-
-      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        addMessage('⚠ VOICE INPUT NOT SUPPORTED IN THIS BROWSER. USE CHROME.', 'orion');
-        return;
-      }
-
-      if (isRecording) {
-        recognition.stop();
-        isRecording = false;
-        btn.classList.remove('recording');
-        btn.textContent = '🎙';
-        return;
-      }
-
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.lang = 'en-US';
-      recognition.continuous = false;
-      recognition.interimResults = false;
-
-      recognition.onstart = () => {
-        isRecording = true;
-        btn.classList.add('recording');
-        btn.textContent = '⏹';
-        document.getElementById('statusText').textContent = 'LISTENING...';
+      item.onclick = (e) => {
+        if (e.target.classList.contains('chat-delete')) return;
+        loadChat(chat.id, chat);
       };
+      list.appendChild(item);
+    });
+  }
 
-      recognition.onresult = (e) => {
-        const transcript = e.results[0][0].transcript;
-        document.getElementById('msgInput').value = transcript;
-        autoResize(document.getElementById('msgInput'));
-        sendMessage();
-      };
+  async function newChat() {
+    try {
+      const res = await fetch(`${API}/chat/new`, { method: 'POST' });
+      const data = await res.json();
+      currentChatId = data.chat_id;
+      clearChatArea();
+      loadChats();
+    } catch {
+      // Just clear the UI for a fresh chat
+      currentChatId = null;
+      clearChatArea();
+    }
+  }
 
-      recognition.onend = () => {
-        isRecording = false;
-        btn.classList.remove('recording');
-        btn.textContent = '🎙';
-        document.getElementById('statusText').textContent = 'SYSTEM ONLINE';
-      };
+  function loadChat(chatId, chatData) {
+    currentChatId = chatId;
+    clearChatArea();
 
-      recognition.onerror = () => {
-        isRecording = false;
-        btn.classList.remove('recording');
-        btn.textContent = '🎙';
-      };
-
-      recognition.start();
+    // Render messages
+    if (chatData.messages && chatData.messages.length > 0) {
+      chatData.messages.forEach(msg => {
+        addMessage(msg.content, msg.role === 'user' ? 'user' : 'orion', false);
+      });
     }
 
-    // Check backend status on load
-    async function checkStatus() {
-      try {
-        const res = await fetch(`${API}/`);
-        const data = await res.json();
-        document.getElementById('statusText').textContent = 'SYSTEM ONLINE';
-      } catch {
-        document.getElementById('statusText').textContent = 'BACKEND OFFLINE';
-        document.getElementById('statusText').style.color = 'var(--danger)';
-        document.querySelector('.status-dot').style.background = 'var(--danger)';
+    // Update active state
+    document.querySelectorAll('.chat-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.id === chatId);
+    });
+  }
+
+  async function deleteChat(chatId, event) {
+    event.stopPropagation();
+    try {
+      await fetch(`${API}/chats/${chatId}`, { method: 'DELETE' });
+      if (currentChatId === chatId) {
+        currentChatId = null;
+        clearChatArea();
       }
-    }
+      loadChats();
+    } catch {}
+  }
 
-    checkStatus();
-  </script>
+  function clearChatArea() {
+    const chatArea = document.getElementById('chatArea');
+    chatArea.innerHTML = `
+      <div class="welcome">
+        <h2>ORION</h2>
+        <p>PRAGMATIC AI ASSISTANT</p>
+        <p style="margin-top:14px;font-size:10px;opacity:0.5;">INSPIRED BY TARS · INTERSTELLAR</p>
+      </div>`;
+  }
+
+  // -------- Messaging --------
+
+  function addMessage(text, sender, animate = true) {
+    const chatArea = document.getElementById('chatArea');
+    const welcome = chatArea.querySelector('.welcome');
+    if (welcome) welcome.remove();
+
+    const msg = document.createElement('div');
+    msg.className = `message ${sender}`;
+    if (!animate) msg.style.animation = 'none';
+
+    msg.innerHTML = `
+      <div class="bubble">
+        <div class="bubble-label">${sender === 'user' ? 'YOU' : 'ORION'}</div>
+        ${text}
+      </div>`;
+
+    chatArea.appendChild(msg);
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+
+  function setTyping(show) {
+    const indicator = document.getElementById('typingIndicator');
+    indicator.classList.toggle('visible', show);
+    if (show) document.getElementById('chatArea').scrollTop = 99999;
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('msgInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    addMessage(text, 'user');
+    setTyping(true);
+
+    try {
+      const res = await fetch(`${API}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, chat_id: currentChatId })
+      });
+      const data = await res.json();
+      currentChatId = data.chat_id;
+      setTyping(false);
+      addMessage(data.reply, 'orion');
+      speakText(data.reply);
+      loadChats(); // refresh sidebar
+    } catch (err) {
+      setTyping(false);
+      addMessage('CONNECTION ERROR. CHECK BACKEND STATUS.', 'orion');
+    }
+  }
+
+  // -------- Personality --------
+
+  async function applyPersonality() {
+    const humor = parseFloat(document.getElementById('humorSlider').value);
+    const honesty = parseFloat(document.getElementById('honestySlider').value);
+    const mode = document.getElementById('modeSelect').value;
+
+    try {
+      await fetch(`${API}/personality`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ humor, honesty, mode })
+      });
+      // ✅ Silent confirmation - no long message
+      const notice = document.createElement('div');
+      notice.style.cssText = 'text-align:center;font-size:10px;color:var(--dim);padding:4px;letter-spacing:1px;';
+      notice.textContent = `— PERSONALITY UPDATED —`;
+      document.getElementById('chatArea').appendChild(notice);
+    } catch {}
+  }
+
+  // -------- Voice Output --------
+
+  function toggleVoiceOutput() {
+    voiceOutputEnabled = !voiceOutputEnabled;
+    const btn = document.getElementById('voiceToggle');
+    btn.classList.toggle('on', voiceOutputEnabled);
+    btn.textContent = voiceOutputEnabled ? '🔊 VOICE' : '🔇 VOICE';
+    if (!voiceOutputEnabled) window.speechSynthesis.cancel();
+  }
+
+  function speakText(text) {
+    if (!voiceOutputEnabled) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v =>
+      v.name.includes('Google UK English Male') ||
+      v.name.includes('David') ||
+      v.name.includes('Male') ||
+      v.lang === 'en-US'
+    );
+    if (preferred) utterance.voice = preferred;
+    utterance.rate = 0.9;
+    utterance.pitch = 0.8;
+    utterance.volume = 1.0;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  // -------- Voice Input --------
+
+  function toggleVoice() {
+    const btn = document.getElementById('voiceBtn');
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      addMessage('VOICE INPUT NOT SUPPORTED. USE CHROME.', 'orion');
+      return;
+    }
+    if (isRecording) {
+      recognition.stop();
+      isRecording = false;
+      btn.classList.remove('recording');
+      btn.textContent = '🎙';
+      return;
+    }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      isRecording = true;
+      btn.classList.add('recording');
+      btn.textContent = '⏹';
+      document.getElementById('statusText').textContent = 'LISTENING...';
+    };
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      document.getElementById('msgInput').value = transcript;
+      autoResize(document.getElementById('msgInput'));
+      sendMessage();
+    };
+    recognition.onend = () => {
+      isRecording = false;
+      btn.classList.remove('recording');
+      btn.textContent = '🎙';
+      document.getElementById('statusText').textContent = 'SYSTEM ONLINE';
+    };
+    recognition.onerror = () => {
+      isRecording = false;
+      btn.classList.remove('recording');
+      btn.textContent = '🎙';
+    };
+    recognition.start();
+  }
+
+  // -------- Status Check --------
+
+  async function checkStatus() {
+    try {
+      await fetch(`${API}/`);
+      document.getElementById('statusText').textContent = 'SYSTEM ONLINE';
+    } catch {
+      document.getElementById('statusText').textContent = 'BACKEND OFFLINE';
+      document.getElementById('statusText').style.color = 'var(--danger)';
+      document.querySelector('.status-dot').style.background = 'var(--danger)';
+    }
+  }
+
+  checkStatus();
+  loadChats();
+</script>
 </body>
 </html>
