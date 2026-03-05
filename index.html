@@ -401,7 +401,7 @@
       <div class="welcome">
         <h2>ORION</h2>
         <p>PRAGMATIC AI ASSISTANT</p>
-        <p style="margin-top:14px;font-size:10px;opacity:0.5;">INSPIRED BY TARS · INTERSTELLAR</p>
+        
       </div>
     </div>
 
@@ -417,6 +417,8 @@
     <!-- Input area -->
     <div class="input-area">
       <button class="btn btn-voice" id="voiceBtn" onclick="toggleVoice()">🎙</button>
+      <button class="btn" onclick="document.getElementById('imageInput').click()" title="Send image">🖼</button>
+      <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="sendImage(this)"/>
       <textarea id="msgInput" placeholder="TRANSMIT MESSAGE TO ORION..." rows="1"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
         oninput="autoResize(this)"></textarea>
@@ -518,7 +520,7 @@
       <div class="welcome">
         <h2>ORION</h2>
         <p>PRAGMATIC AI ASSISTANT</p>
-        <p style="margin-top:14px;font-size:10px;opacity:0.5;">INSPIRED BY TARS · INTERSTELLAR</p>
+        
       </div>`;
   }
 
@@ -684,6 +686,62 @@
       document.getElementById('statusText').style.color = 'var(--danger)';
       document.querySelector('.status-dot').style.background = 'var(--danger)';
     }
+  }
+
+  // -------- Image Upload --------
+  async function sendImage(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const caption = document.getElementById('msgInput').value.trim();
+    document.getElementById('msgInput').value = '';
+
+    // Show preview in chat
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const chatArea = document.getElementById('chatArea');
+      const welcome = chatArea.querySelector('.welcome');
+      if (welcome) welcome.remove();
+
+      const msg = document.createElement('div');
+      msg.className = 'message user';
+      msg.innerHTML = `
+        <div class="bubble">
+          <div class="bubble-label">YOU</div>
+          <img src="${e.target.result}" style="max-width:200px;max-height:200px;display:block;margin-bottom:${caption ? '8px' : '0'}"/>
+          ${caption ? caption : ''}
+        </div>`;
+      chatArea.appendChild(msg);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    };
+    reader.readAsDataURL(file);
+
+    setTyping(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('message', caption || '');
+      formData.append('chat_id', currentChatId || '');
+
+      const res = await fetch(`${API}/chat/image`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      currentChatId = data.chat_id;
+      setTyping(false);
+      addMessage(data.reply, 'orion');
+      speakText(data.reply);
+      loadChats();
+    } catch (err) {
+      setTyping(false);
+      addMessage('ERROR PROCESSING IMAGE.', 'orion');
+    }
+
+    // Reset input
+    input.value = '';
   }
 
   checkStatus();

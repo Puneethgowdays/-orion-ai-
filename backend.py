@@ -1,12 +1,13 @@
 import os
 import json
+import base64
 from datetime import datetime
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from typing import Optional, List
-from llm_engine import query_llm
+from typing import Optional
+from llm_engine import query_llm, query_llm_with_image
 from personality import Personality
 
 app = FastAPI(title="ORION AI Backend")
@@ -20,8 +21,6 @@ app.add_middleware(
 
 CHATS_FILE = "chats.json"
 
-# -------- Chat Storage --------
-
 def load_chats():
     if os.path.exists(CHATS_FILE):
         with open(CHATS_FILE, "r") as f:
@@ -32,15 +31,9 @@ def save_chats(chats):
     with open(CHATS_FILE, "w") as f:
         json.dump(chats, f, indent=2)
 
-# Global personality
 orion = Personality(humor=50, honesty=60, memory_limit=20, mode="serious")
-
-# Active chat session
-active_chat_id = None
 chats = load_chats()
 
-
-# -------- Models --------
 
 class ChatRequest(BaseModel):
     message: str
@@ -50,26 +43,19 @@ class ChatResponse(BaseModel):
     reply: str
     chat_id: str
 
-class NewChatResponse(BaseModel):
-    chat_id: str
-    title: str
-
 class SetPersonalityRequest(BaseModel):
     humor: Optional[float] = None
     honesty: Optional[float] = None
     mode: Optional[str] = None
 
 
-# -------- Routes --------
-
 @app.get("/")
 def root():
     return FileResponse("index.html")
 
 
-@app.post("/chat/new", response_model=NewChatResponse)
+@app.post("/chat/new")
 def new_chat():
-    """Create a new chat session."""
     chat_id = datetime.now().strftime("%Y%m%d%H%M%S")
     chats[chat_id] = {
         "id": chat_id,
@@ -79,18 +65,16 @@ def new_chat():
     }
     save_chats(chats)
     orion.memory = []
-    return NewChatResponse(chat_id=chat_id, title="New Chat")
+    return {"chat_id": chat_id, "title": "New Chat"}
 
 
 @app.get("/chats")
 def get_chats():
-    """Get all chat sessions."""
     return {"chats": list(chats.values())}
 
 
 @app.get("/chats/{chat_id}")
 def get_chat(chat_id: str):
-    """Get a specific chat session."""
     if chat_id not in chats:
         raise HTTPException(status_code=404, detail="Chat not found.")
     return chats[chat_id]
@@ -98,7 +82,6 @@ def get_chat(chat_id: str):
 
 @app.delete("/chats/{chat_id}")
 def delete_chat(chat_id: str):
-    """Delete a chat session."""
     if chat_id not in chats:
         raise HTTPException(status_code=404, detail="Chat not found.")
     del chats[chat_id]
@@ -108,38 +91,67 @@ def delete_chat(chat_id: str):
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(request: ChatRequest):
-    """Send a message and get ORION's reply."""
     user_message = request.message.strip()
     if not user_message:
         raise HTTPException(status_code=400, detail="Message cannot be empty.")
 
-    # Use existing chat or create new one
     chat_id = request.chat_id
     if not chat_id or chat_id not in chats:
         chat_id = datetime.now().strftime("%Y%m%d%H%M%S")
         chats[chat_id] = {
             "id": chat_id,
-            "title": user_message[:40],  # first message = title
+            "title": user_message[:40],
             "messages": [],
             "created": datetime.now().isoformat()
         }
 
-    # Load this chat's memory into orion
     orion.memory = [f"{m['role'].upper()}: {m['content']}" for m in chats[chat_id]["messages"][-20:]]
-
-    # Get response
     orion.remember(f"You: {user_message}")
     context = orion.build_context(orion.memory)
     final_prompt = context + f"\nUser says: {user_message}\nORION response:"
     ai_reply = query_llm(final_prompt)
     orion.remember(f"ORION: {ai_reply}")
 
-    # Save messages to chat
     chats[chat_id]["messages"].append({"role": "user", "content": user_message, "time": datetime.now().isoformat()})
     chats[chat_id]["messages"].append({"role": "orion", "content": ai_reply, "time": datetime.now().isoformat()})
     save_chats(chats)
 
     return ChatResponse(reply=ai_reply, chat_id=chat_id)
+
+
+@app.post("/chat/image")
+async def chat_with_image(
+    message: str = Form(""),
+    chat_id: str = Form(""),
+    file: UploadFile = File(...)
+):
+    """Handle image upload + optional text message."""
+    # Read and encode image
+    image_data = await file.read()
+    image_base64 = base64.b64encode(image_data).decode("utf-8")
+    media_type = file.content_type or "image/jpeg"
+
+    # Create chat if needed
+    if not chat_id or chat_id not in chats:
+        chat_id = datetime.now().strftime("%Y%m%d%H%M%S")
+        chats[chat_id] = {
+            "id": chat_id,
+            "title": message[:40] if message else "Image Chat",
+            "messages": [],
+            "created": datetime.now().isoformat()
+        }
+
+    prompt = message.strip() if message.strip() else "What do you see in this image?"
+
+    # Get vision response
+    ai_reply = query_llm_with_image(prompt, image_base64, media_type)
+
+    # Save to chat history
+    chats[chat_id]["messages"].append({"role": "user", "content": f"[Image] {prompt}", "time": datetime.now().isoformat()})
+    chats[chat_id]["messages"].append({"role": "orion", "content": ai_reply, "time": datetime.now().isoformat()})
+    save_chats(chats)
+
+    return {"reply": ai_reply, "chat_id": chat_id}
 
 
 @app.get("/status")
@@ -149,7 +161,6 @@ def status():
         "honesty": orion.honesty,
         "mode": orion.mode,
         "memory_count": len(orion.memory),
-        "memory_limit": orion.memory_limit,
         "total_chats": len(chats)
     }
 
